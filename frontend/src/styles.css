@@ -1,0 +1,154 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff6fb;
+}
+
+/* NAVBAR MEJORADA */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #ffb3d9;
+  position: sticky;
+  top: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-btn {
+  background: #ff99cc;
+  border: none;
+  border-radius: 50%;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: 0.3s;
+  color: #4a0044;
+}
+
+.nav-btn:hover {
+  background: #ff66b3;
+  transform: scale(1.1);
+}
+
+.logo {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4a0044;
+}
+
+.logo-icon {
+  font-size: 1.6rem;
+  color: #4a0044;
+}
+
+.carrito-link {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.navbar a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #4a0044;
+  transition: 0.3s;
+}
+
+.navbar a:hover {
+  color: white;
+}
+
+/* PÁGINAS Y PRODUCTOS */
+
+.page {
+  padding: 2rem;
+}
+
+.product-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.product-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.product-card .precio {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #b30059;
+}
+
+.product-card .actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.product-card button,
+.product-card a,
+button {
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  background: #ff66b3;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.product-card a {
+  text-decoration: none;
+}
+
+.product-detail {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.product-detail img {
+  width: 320px;
+  border-radius: 12px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  background: #ffe6f2;
+  padding: 0.8rem;
+  border-radius: 10px;
+}
+
+.cart-item img {
+  width: 90px;
+  border-radius: 8px;
+}

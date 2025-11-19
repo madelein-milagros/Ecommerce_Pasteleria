@@ -1,35 +1,24 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
+import { useAddToCart } from "../api/cart";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const addMutation = useAddToCart();
 
   const addToCart = (product) => {
-    setItems((prev) => {
-      const existing = prev.find((p) => p.id === product.id);
-      if (existing) {
-        return prev.map((p) =>
-          p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
+    addMutation.mutate({
+      producto_id: product.id,
+      cantidad: 1
     });
+    alert("Producto añadido al carrito 🎉");
   };
-
-  const removeFromCart = (id) => {
-    setItems((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const clearCart = () => setItems([]);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ addToCart }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-export function useCart() {
-  return useContext(CartContext);
-}
+export const useCart = () => useContext(CartContext);

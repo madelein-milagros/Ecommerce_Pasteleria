@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { useCategories } from "../api/categories";
+import { usePrefetchCategory } from "../api/categories";
 
 export default function Categorias() {
   const { data: categorias, isLoading } = useCategories();
+  const prefetchCategory = usePrefetchCategory();
 
   if (isLoading) return <div className="page">Cargando...</div>;
 
-  // 🎀 Descripciones bonitas por categoría
   const getDescription = (nombre) => {
     switch (nombre.toLowerCase()) {
       case "tortas":
@@ -14,6 +15,7 @@ export default function Categorias() {
       case "cupcakes":
         return "🧁 Dulces, suaves y perfectos para regalar";
       case "postres fríos":
+      case "postres frios":
         return "🍨 Delicias refrescantes para cualquier día";
       case "galletas":
         return "🍪 Crujientes y llenas de sabor casero";
@@ -35,6 +37,7 @@ export default function Categorias() {
             to={`/categoria/${cat.id}`}
             key={cat.id}
             className="category-card"
+            onMouseEnter={() => prefetchCategory(cat.id)}  // ⭐ PREFETCH REAL AQUÍ
           >
             <div className="category-info">
               <span className="category-name">{cat.nombre}</span>
@@ -42,6 +45,7 @@ export default function Categorias() {
                 {getDescription(cat.nombre)}
               </span>
             </div>
+
             <span className="category-pill">Ver →</span>
           </Link>
         ))}

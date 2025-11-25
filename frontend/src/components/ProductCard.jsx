@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useAddToCart } from "../api/cart";
+import { useCart } from "../context/CartContext";
 
 const getImageUrl = (imagen) => {
   if (!imagen) return "";
@@ -9,21 +9,17 @@ const getImageUrl = (imagen) => {
 };
 
 export default function ProductCard({ product }) {
-  const addToCart = useAddToCart();
+  const { addToCart } = useCart();
 
   const handleAdd = () => {
-    addToCart.mutate(
-      { producto_id: product.id, cantidad: 1 },
-      {
-        onSuccess: () => {
-          toast.success("Producto agregado al carrito 🎉");
-        },
-        onError: (err) => {
-          const msg = err?.response?.data?.detail || "No se pudo agregar al carrito";
-          toast.error(msg);
-        },
-      }
-    );
+    addToCart(product, {
+      onSuccess: () => toast.success("Agregado 🎉"),
+      onError: (err) => {
+        const msg =
+          err?.response?.data?.detail || "No se pudo agregar al carrito";
+        toast.error(msg);
+      },
+    });
   };
 
   return (

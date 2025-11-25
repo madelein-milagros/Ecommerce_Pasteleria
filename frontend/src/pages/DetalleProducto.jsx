@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { useAddToCart } from "../api/cart";
+import { useProduct, usePrefetchProduct } from "../api/products";
+import { useCart } from "../context/CartContext";
 
 const getImageUrl = (imagen) => {
   if (!imagen) return "";
@@ -13,37 +11,23 @@ const getImageUrl = (imagen) => {
 export default function DetalleProducto() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [producto, setProducto] = useState(null);
-  const addToCart = useAddToCart();
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:8000/api/productos/${id}/`)
-      .then((res) => setProducto(res.data))
-      .catch((err) => console.error(err));
-  }, [id]);
+  const { data: producto, isLoading } = useProduct(id);
+  const prefetch = usePrefetchProduct();
+  const { addToCart } = useCart();
+
+  // Prefetch al cargar (mejora de rendimiento)
+  if (id) prefetch(id);
+
+  if (isLoading) return <p className="page">Cargando...</p>;
+  if (!producto) return <p>No encontrado</p>;
 
   const handleAdd = () => {
-    if (!producto) return;
-    addToCart.mutate(
-      { producto_id: producto.id, cantidad: 1 },
-      {
-        onSuccess: () => {
-          toast.success("Producto agregado al carrito 🎉");
-        },
-        onError: () => {
-          toast.error("Error al agregar al carrito 😢");
-        },
-      }
-    );
+    addToCart(producto);
   };
-
-  if (!producto) return <p>Cargando...</p>;
 
   return (
     <div className="page product-detail">
-
-      {/* BOTÓN VOLVER */}
       <button onClick={() => navigate(-1)} className="btn-volver">
         ⬅ Volver
       </button>
@@ -58,6 +42,7 @@ export default function DetalleProducto() {
         <p className="precio">S/ {producto.precio}</p>
         <p className="stock">Stock disponible: {producto.stock}</p>
         <p>{producto.descripcion}</p>
+
         <button onClick={handleAdd}>Añadir al carrito 🛒</button>
       </div>
     </div>

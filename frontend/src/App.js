@@ -13,6 +13,7 @@ export default function App() {
     <BrowserRouter>
       <CartProvider>
         <Navbar />
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/producto/:id" element={<DetalleProducto />} />
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/categorias" element={<Categorias />} />
           <Route path="/categoria/:id" element={<ProductosPorCategoria />} />
         </Routes>
+
       </CartProvider>
     </BrowserRouter>
   );

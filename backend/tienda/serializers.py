@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Categoria, Producto, Carrito, ItemCarrito
+from django.contrib.auth.models import User
+from .models import Categoria, Producto, Carrito, ItemCarrito, Order, OrderItem
+
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,3 +54,47 @@ class CarritoSerializer(serializers.ModelSerializer):
 
     def get_total(self, obj):
         return obj.total
+
+
+# ==============================
+# 🔐 REGISTRO DE USUARIO
+# ==============================
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=6)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password')
+
+    def create(self, validated_data):
+        return User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+
+
+# ==============================
+# 🧾 ORDER SERIALIZERS
+# ==============================
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ('id', 'product', 'quantity', 'price')
+
+    def get_product(self, obj):
+        return {
+            "id": obj.product.id,
+            "nombre": obj.product.nombre,
+            "imagen": getattr(obj.product, 'imagen', None),
+        }
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ('id', 'total', 'payment_id', 'status', 'created_at', 'items')

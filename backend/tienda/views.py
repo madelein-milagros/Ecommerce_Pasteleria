@@ -1,17 +1,37 @@
-from rest_framework import generics, status, viewsets
+from django.db.models import Q
+from django.conf import settings
+from django.contrib.auth.models import User
+
+import stripe
+
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Q
 
-from .models import Producto, Categoria, Carrito, ItemCarrito
+from .models import (
+    Categoria,
+    Producto,
+    Carrito,
+    ItemCarrito,
+    Order,
+    OrderItem,
+)
 from .serializers import (
-    ProductoSerializer,
     CategoriaSerializer,
+    ProductoSerializer,
     CarritoSerializer,
     ItemCarritoSerializer,
+    RegisterSerializer,
+    OrderSerializer,
 )
 
-# --------- Productos ---------
+# Configurar Stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+# ==========================
+#   PRODUCTOS Y CATEGORÍAS
+# ==========================
 
 class ProductoListCreateView(generics.ListCreateAPIView):
     queryset = Producto.objects.filter(activo=True)
@@ -42,10 +62,15 @@ class CategoriaListView(generics.ListAPIView):
     serializer_class = CategoriaSerializer
 
 
-# --------- Carrito ---------
+# ==========================
+#          CARRITO
+# ==========================
 
 def get_default_cart():
-    # para el laboratorio asumimos 1 carrito "por defecto"
+    """
+    Para el laboratorio asumimos 1 carrito 'global' con id=1.
+    En un proyecto real, iría ligado al usuario.
+    """
     carrito, created = Carrito.objects.get_or_create(id=1)
     return carrito
 
@@ -54,6 +79,7 @@ class CarritoDetailView(APIView):
     """
     GET /api/carrito/ -> contenido del carrito
     """
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         carrito = get_default_cart()
@@ -66,6 +92,7 @@ class CarritoAddItemView(APIView):
     POST /api/carrito/items/
     body: { "producto_id": 1, "cantidad": 2 }
     """
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         carrito = get_default_cart()
@@ -104,6 +131,7 @@ class CarritoItemUpdateDeleteView(APIView):
     PATCH /api/carrito/items/<id>/  body: { "cantidad": 3 }
     DELETE /api/carrito/items/<id>/
     """
+    permission_classes = [permissions.AllowAny]
 
     def patch(self, request, pk):
         carrito = get_default_cart()
@@ -141,3 +169,122 @@ class CarritoItemUpdateDeleteView(APIView):
 
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ==========================
+#        AUTENTICACIÓN
+# ==========================
+
+class RegisterView(generics.CreateAPIView):
+    """
+    POST /api/auth/register/
+    {
+      "username": "milagros",
+      "email": "m@example.com",
+      "password": "123456"
+    }
+    """
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+# ==========================
+#    HISTORIAL DE COMPRAS
+# ==========================
+
+class OrderHistoryView(generics.ListAPIView):
+    """
+    GET /api/historial-compras/
+    (requiere usuario autenticado)
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+
+# ==========================
+#    PAGOS CON STRIPE
+# ==========================
+
+class CreatePaymentIntentView(APIView):
+    """
+    POST /api/payment/create-intent/
+    body: { "amount": 6000 }  # S/ 60.00 en céntimos
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        amount = request.data.get('amount')
+
+        if not amount:
+            return Response({"detail": "Falta el monto"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=int(amount),
+                currency="pen",  # o "usd"
+                metadata={"user_id": request.user.id}
+            )
+            return Response({"clientSecret": intent['client_secret']})
+        except Exception as e:
+            return Response(
+                {"detail": f"Error al crear PaymentIntent: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class CheckoutConfirmView(APIView):
+    """
+    POST /api/checkout/confirm/
+    {
+      "items": [
+        { "producto_id": 1, "cantidad": 2, "precio": "15.00" },
+        { "producto_id": 5, "cantidad": 1, "precio": "30.00" }
+      ],
+      "total": "60.00",
+      "payment_id": "pi_XXX"
+    }
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        items = data.get('items', [])
+        total = data.get('total')
+        payment_id = data.get('payment_id')
+
+        if not items:
+            return Response({"detail": "No se enviaron items"}, status=status.HTTP_400_BAD_REQUEST)
+        if total is None:
+            return Response({"detail": "Falta el total"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear la orden
+        order = Order.objects.create(
+            user=request.user,
+            total=total,
+            payment_id=payment_id,
+            status='paid'
+        )
+
+        # Crear items asociados
+        for item in items:
+            try:
+                producto = Producto.objects.get(id=item['producto_id'])
+            except Producto.DoesNotExist:
+                continue  # podrías manejar error distinto
+
+            cantidad = int(item['cantidad'])
+            precio = item.get('precio', producto.precio)
+
+            OrderItem.objects.create(
+                order=order,
+                product=producto,
+                quantity=cantidad,
+                price=precio
+            )
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

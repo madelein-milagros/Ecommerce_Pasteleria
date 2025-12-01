@@ -6,7 +6,9 @@ export default function Navbar() {
   const location = useLocation();
   const [search, setSearch] = useState("");
 
-  // Cuando cambie la URL, actualizar el input
+  const token = localStorage.getItem("token");
+
+  // Detectar búsqueda en la URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setSearch(params.get("search") || "");
@@ -15,6 +17,11 @@ export default function Navbar() {
   const handleSearch = (e) => {
     setSearch(e.target.value);
     navigate(`/?search=${e.target.value}`);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -33,7 +40,34 @@ export default function Navbar() {
       />
 
       <div className="nav-right">
-        <Link to="/carrito" className="carrito-link">🛒 Carrito</Link>
+        <Link to="/carrito">🛒 Carrito</Link>
+
+        {/* Si NO hay sesión → mostrar Login y Register */}
+        {!token && (
+          <>
+            <Link to="/login">Iniciar sesión</Link>
+            <Link to="/register">Registrarse</Link>
+          </>
+        )}
+
+        {/* Si hay sesión → mostrar historial + logout */}
+        {token && (
+          <>
+            <Link to="/historial">📜 Historial</Link>
+            <button 
+              onClick={logout} 
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                color: "#4a0044",
+                fontWeight: "bold"
+              }}
+            >
+              Cerrar sesión
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

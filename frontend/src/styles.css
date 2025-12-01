@@ -337,3 +337,242 @@ body {
   background: #ff1a8c;
 }
 
+
+/* ================================
+   LOGIN & REGISTER – PÁGINAS PASTEL
+===================================*/
+
+/* CONTENEDOR GENERAL */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffe1f0, #ffd0f5, #ffc9e3);
+}
+
+/* CARD PRINCIPAL */
+.auth-card {
+  width: 85%;
+  max-width: 950px;
+  background: white;
+  border-radius: 25px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: 0 12px 32px rgba(255, 100, 160, 0.25);
+  animation: fadeIn 0.7s ease-in-out;
+}
+
+/* ANIMACIÓN */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* LADO IZQUIERDO */
+.auth-left {
+  flex: 1;
+  background: linear-gradient(120deg, #ffb3d9, #ffc2e6, #ffd6f5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.auth-left img {
+  width: 85%;
+  max-width: 330px;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+}
+
+/* LADO DERECHO */
+.auth-right {
+  flex: 1;
+  padding: 50px;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #c20071;
+  margin-bottom: 10px;
+}
+
+.auth-subtitle {
+  color: #8c4f82;
+  margin-bottom: 30px;
+  font-size: 1rem;
+}
+
+/* INPUTS */
+.auth-input {
+  width: 100%;
+  padding: 13px;
+  margin: 12px 0;
+  border-radius: 12px;
+  border: 2px solid #ffd0ec;
+  background: #fff9fc;
+  transition: 0.2s;
+  font-size: 1rem;
+}
+
+.auth-input:focus {
+  border-color: #ff73c6;
+  box-shadow: 0 0 5px rgba(255, 115, 198, 0.5);
+  outline: none;
+}
+
+/* BOTÓN PRINCIPAL */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background: linear-gradient(90deg, #ff66c4, #ff8ad6);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.auth-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 80, 160, 0.4);
+}
+
+/* TEXTO INFERIOR */
+.auth-bottom-text {
+  margin-top: 20px;
+  color: #6a2e5a;
+}
+
+.auth-bottom-text a {
+  color: #d60085;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.auth-bottom-text a:hover {
+  text-decoration: underline;
+}
+
+
+
+/* =======================
+   AUTH PAGES - LOGIN / REGISTER
+========================== */
+
+.auth-container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #ffd3ec, #ffc6f3, #ffe3fb);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-box {
+  width: 900px;
+  height: 520px;
+  background: white;
+  border-radius: 25px;
+  box-shadow: 0 10px 25px rgba(255, 100, 180, 0.2);
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sección izquierda */
+.auth-left {
+  width: 50%;
+  background: #ffe6f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-left img {
+  width: 80%;
+  max-width: 330px;
+}
+
+/* Sección derecha */
+.auth-right {
+  width: 50%;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #b3006b;
+  margin-bottom: 5px;
+}
+
+.auth-sub {
+  margin-bottom: 25px;
+  color: #a1558d;
+  font-size: 1rem;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #ffd1ec;
+  font-size: 1rem;
+  outline: none;
+  background: #fff7fc;
+}
+
+.auth-form input:focus {
+  border-color: #ff8ac8;
+  box-shadow: 0 0 8px rgba(255, 128, 180, 0.3);
+}
+
+/* Botón */
+.btn-auth {
+  background: linear-gradient(135deg, #ff6fcb, #ff46a6);
+  border: none;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.btn-auth:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #ff4daf, #ff2f99);
+}
+
+/* Links */
+.auth-links {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.auth-links a {
+  color: #d10085;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}

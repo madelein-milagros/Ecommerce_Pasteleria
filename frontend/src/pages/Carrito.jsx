@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   useCart,
   useUpdateCartItem,
@@ -5,6 +6,8 @@ import {
 } from "../api/cart";
 
 export default function Carrito() {
+  const navigate = useNavigate();
+
   const { data: cart, isLoading } = useCart();
   const updateItem = useUpdateCartItem();
   const deleteItem = useDeleteCartItem();
@@ -37,11 +40,9 @@ export default function Carrito() {
               <h3>{item.producto.nombre}</h3>
               <p>Precio: S/ {item.producto.precio}</p>
 
-              <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <button
-                  onClick={() =>
-                    handleChange(item, Math.max(1, item.cantidad - 1))
-                  }
+                  onClick={() => handleChange(item, Math.max(1, item.cantidad - 1))}
                 >
                   -
                 </button>
@@ -57,13 +58,24 @@ export default function Carrito() {
 
               <p>Subtotal: S/ {item.subtotal}</p>
 
-              <button onClick={() => handleRemove(item.id)}>Eliminar</button>
+              <button className="btn-pastel" onClick={() => handleRemove(item.id)}>
+                Eliminar
+              </button>
             </div>
           </div>
         ))}
       </div>
 
       <h2>Total: S/ {cart.total}</h2>
+
+      {/* BOTÓN IR AL CHECKOUT */}
+      <button
+        className="btn-pastel"
+        style={{ marginTop: "20px", fontSize: "1.1rem" }}
+        onClick={() => navigate("/checkout")}
+      >
+        🧁 Finalizar compra
+      </button>
     </div>
   );
 }

@@ -576,3 +576,282 @@ body {
 .auth-links a:hover {
   text-decoration: underline;
 }
+
+/* ============================================
+   🍰 CHECKOUT COMPLETO - ESTILOS ADICIONALES
+   ============================================ */
+
+/* AGREGA ESTO AL FINAL DE TU styles.css EXISTENTE */
+
+/* Container principal del checkout */
+.checkout-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 968px) {
+  .checkout-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   📋 RESUMEN DEL PEDIDO
+   ============================================ */
+.order-summary {
+  background: linear-gradient(135deg, #fbeaf2 0%, #ffe5f1 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(255, 150, 200, 0.2);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.order-summary h2 {
+  color: #4a0044;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 102, 179, 0.15);
+}
+
+.summary-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid #ffe5f1;
+}
+
+.summary-item div {
+  flex: 1;
+}
+
+.summary-item p {
+  margin: 0.25rem 0;
+  color: #4a0044;
+}
+
+.summary-item strong {
+  color: #ff66b3;
+  font-size: 1.1rem;
+}
+
+.total {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 3px solid #ff66b3;
+  text-align: right;
+}
+
+.total h3 {
+  color: #4a0044;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* ============================================
+   💳 SECCIÓN DE PAGO
+   ============================================ */
+.payment-section {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.stripe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stripe-form h3 {
+  color: #4a0044;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   🎨 STRIPE ELEMENTS PERSONALIZADO
+   ============================================ */
+.StripeElement {
+  padding: 16px;
+  border: 2px solid #e8e8e8;
+  border-radius: 14px;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.StripeElement--focus {
+  border-color: #ff66b3;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255, 102, 179, 0.1);
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+  background: #fff5f5;
+}
+
+.StripeElement--complete {
+  border-color: #34d399;
+  background: white;
+}
+
+/* ============================================
+   🔒 BADGES DE SEGURIDAD
+   ============================================ */
+.security-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e8e8e8;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.security-badges::before {
+  content: "🔒";
+  font-size: 1.2rem;
+}
+
+/* ============================================
+   ⏳ ESTADO DE CARGA
+   ============================================ */
+.btn-pastel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #cccccc;
+}
+
+.processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.processing-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #ff66b3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   📱 RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .order-summary {
+    position: static;
+  }
+
+  .payment-section {
+    padding: 1.5rem;
+  }
+
+  .summary-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .summary-item img {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+/* ============================================
+   ✨ ANIMACIONES
+   ============================================ */
+.checkout-container > * {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   🎉 SUCCESS MESSAGE
+   ============================================ */
+.payment-success {
+  text-align: center;
+  padding: 3rem;
+  animation: fadeInScale 0.5s ease-out;
+}
+
+.payment-success h1 {
+  color: #34d399;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

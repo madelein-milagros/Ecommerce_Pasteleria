@@ -1,3 +1,4 @@
+// src/pages/Historial.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -17,6 +18,7 @@ export default function Historial() {
 
       setOrders(res.data);
     } catch (error) {
+      console.error(error);
       toast.error("No se pudo obtener el historial 😢");
     }
   };
@@ -36,22 +38,32 @@ export default function Historial() {
           {orders.map((order) => (
             <div key={order.id} className="card pastel-card">
               <h3>Orden #{order.id}</h3>
-              <p>Fecha: {new Date(order.created_at).toLocaleString()}</p>
-              <p>Total: S/ {order.total}</p>
+              <p>
+                <strong>Fecha:</strong>{" "}
+                {new Date(order.created_at).toLocaleString()}
+              </p>
+              <p>
+                <strong>Total:</strong> S/ {order.total}
+              </p>
 
               <h4>Productos:</h4>
-              {order.items.map((item) => (
-                <div key={item.id} className="item">
-                  <img
-                    src={`http://localhost:8000${item.product.imagen}`}
-                    alt={item.product.nombre}
-                    className="img-small"
-                  />
-                  <p>
-                    {item.product.nombre} × {item.quantity} — S/ {item.price}
-                  </p>
-                </div>
-              ))}
+              <div className="historial-items">
+                {order.items.map((item) => (
+                  <div key={item.id} className="historial-item">
+                    <img
+                      src={`http://localhost:8000${item.product.imagen}`}
+                      alt={item.product.nombre}
+                      className="img-small"
+                    />
+                    <div>
+                      <p className="item-name">{item.product.nombre}</p>
+                      <p>
+                        Cantidad: {item.quantity} — S/ {item.price}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>

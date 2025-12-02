@@ -6,9 +6,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import CheckoutForm from "../components/CheckoutForm";
 
-// 🔑 IMPORTANTE: Reemplaza con tu STRIPE_PUBLISHABLE_KEY
-// La obtienes en: https://dashboard.stripe.com/test/apikeys
-// Puedes usar la clave de prueba para desarrollo
+
+
 export default function Checkout() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(null);
@@ -42,14 +41,20 @@ export default function Checkout() {
         // 2️⃣ Crear PaymentIntent en el backend
         const intentRes = await axios.post(
           "http://localhost:8000/api/payment/create-intent/",
-          { amount: Math.round(cartData.total * 100) }, // Convertir a céntimos
+          { amount: Math.round(cartData.total * 100) }, // céntimos
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         setClientSecret(intentRes.data.clientSecret);
       } catch (error) {
-        console.error(error);
-        toast.error("Error al cargar el checkout");
+        console.error(
+          "ERROR INIT CHECKOUT:",
+          error.response?.status,
+          error.response?.data || error.message
+        );
+        toast.error(
+          error.response?.data?.detail || "Error al cargar el checkout"
+        );
         navigate("/carrito");
       } finally {
         setLoading(false);
@@ -70,23 +75,42 @@ export default function Checkout() {
         precio: item.producto.precio,
       }));
 
-      await axios.post(
+      const body = {
+        items,
+        total: cart.total,
+        payment_id: paymentIntentId,
+      };
+
+      console.log("📤 Enviando confirmación:", body);
+
+      const res = await axios.post(
         "http://localhost:8000/api/checkout/confirm/",
+        body,
         {
-          items,
-          total: cart.total,
-          payment_id: paymentIntentId,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
       );
+
+      console.log("ORDEN GUARDADA OK:", res.data);
+      toast.success("¡Pago exitoso! 🎉");
 
       // Redirigir al historial
       setTimeout(() => {
         navigate("/historial");
       }, 1500);
     } catch (error) {
-      console.error(error);
-      toast.error("Error al guardar la orden");
+      console.error(
+        "ERROR CHECKOUT CONFIRM:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+      toast.error(
+        error.response?.data?.detail || "Error al guardar la orden"
+      );
     }
   };
 
@@ -98,7 +122,7 @@ export default function Checkout() {
     );
   }
 
-  if (!clientSecret) {
+  if (!clientSecret || !cart) {
     return (
       <div className="page">
         <p>Error al cargar el pago</p>

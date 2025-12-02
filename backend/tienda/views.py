@@ -25,7 +25,10 @@ from .serializers import (
     OrderSerializer,
 )
 
-# Configurar Stripe
+# ==========================
+#   CONFIGURACIÓN STRIPE
+# ==========================
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -39,8 +42,8 @@ class ProductoListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        categoria_id = self.request.query_params.get('categoria')
-        search = self.request.query_params.get('search')
+        categoria_id = self.request.query_params.get("categoria")
+        search = self.request.query_params.get("search")
 
         if categoria_id:
             qs = qs.filter(categoria_id=categoria_id)
@@ -63,22 +66,15 @@ class CategoriaListView(generics.ListAPIView):
 
 
 # ==========================
-#          CARRITO
+#            CARRITO
 # ==========================
 
 def get_default_cart():
-    """
-    Para el laboratorio asumimos 1 carrito 'global' con id=1.
-    En un proyecto real, iría ligado al usuario.
-    """
     carrito, created = Carrito.objects.get_or_create(id=1)
     return carrito
 
 
 class CarritoDetailView(APIView):
-    """
-    GET /api/carrito/ -> contenido del carrito
-    """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -88,38 +84,33 @@ class CarritoDetailView(APIView):
 
 
 class CarritoAddItemView(APIView):
-    """
-    POST /api/carrito/items/
-    body: { "producto_id": 1, "cantidad": 2 }
-    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         carrito = get_default_cart()
         serializer = ItemCarritoSerializer(data=request.data)
+
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        producto = serializer.validated_data['producto']
-        cantidad = serializer.validated_data['cantidad']
+        producto = serializer.validated_data["producto"]
+        cantidad = serializer.validated_data["cantidad"]
 
         if cantidad < 1:
-            return Response({"detail": "La cantidad mínima es 1."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "La cantidad mínima es 1"}, status=status.HTTP_400_BAD_REQUEST)
 
         if cantidad > producto.stock:
-            return Response({"detail": "No hay stock suficiente."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "No hay stock suficiente"}, status=status.HTTP_400_BAD_REQUEST)
 
         item, created = ItemCarrito.objects.get_or_create(
             carrito=carrito, producto=producto,
-            defaults={'cantidad': cantidad}
+            defaults={"cantidad": cantidad}
         )
+
         if not created:
             nueva_cantidad = item.cantidad + cantidad
             if nueva_cantidad > producto.stock:
-                return Response({"detail": "No hay stock suficiente."},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "No hay stock suficiente"}, status=status.HTTP_400_BAD_REQUEST)
             item.cantidad = nueva_cantidad
             item.save()
 
@@ -127,10 +118,6 @@ class CarritoAddItemView(APIView):
 
 
 class CarritoItemUpdateDeleteView(APIView):
-    """
-    PATCH /api/carrito/items/<id>/  body: { "cantidad": 3 }
-    DELETE /api/carrito/items/<id>/
-    """
     permission_classes = [permissions.AllowAny]
 
     def patch(self, request, pk):
@@ -138,24 +125,18 @@ class CarritoItemUpdateDeleteView(APIView):
         try:
             item = carrito.items.get(pk=pk)
         except ItemCarrito.DoesNotExist:
-            return Response({"detail": "Item no encontrado."},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Item no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
-        nueva_cantidad = request.data.get('cantidad')
-        if nueva_cantidad is None:
-            return Response({"detail": "Debe enviar cantidad."},
-                            status=status.HTTP_400_BAD_REQUEST)
+        cantidad = request.data.get("cantidad")
+        cantidad = int(cantidad)
 
-        nueva_cantidad = int(nueva_cantidad)
-        if nueva_cantidad < 1:
-            return Response({"detail": "La cantidad mínima es 1."},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if cantidad < 1:
+            return Response({"detail": "La cantidad mínima es 1"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if nueva_cantidad > item.producto.stock:
-            return Response({"detail": "No hay stock suficiente."},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if cantidad > item.producto.stock:
+            return Response({"detail": "No hay stock suficiente"}, status=status.HTTP_400_BAD_REQUEST)
 
-        item.cantidad = nueva_cantidad
+        item.cantidad = cantidad
         item.save()
         return Response(ItemCarritoSerializer(item).data)
 
@@ -164,127 +145,86 @@ class CarritoItemUpdateDeleteView(APIView):
         try:
             item = carrito.items.get(pk=pk)
         except ItemCarrito.DoesNotExist:
-            return Response({"detail": "Item no encontrado."},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Item no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # ==========================
-#        AUTENTICACIÓN
+#       AUTENTICACIÓN
 # ==========================
 
 class RegisterView(generics.CreateAPIView):
-    """
-    POST /api/auth/register/
-    {
-      "username": "milagros",
-      "email": "m@example.com",
-      "password": "123456"
-    }
-    """
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
 
 # ==========================
-#    HISTORIAL DE COMPRAS
+#     HISTORIAL DE COMPRAS
 # ==========================
 
 class OrderHistoryView(generics.ListAPIView):
-    """
-    GET /api/historial-compras/
-    (requiere usuario autenticado)
-    """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+        return Order.objects.filter(user=self.request.user).order_by("-created_at")
 
 
 # ==========================
-#    PAGOS CON STRIPE
+#   PAGOS Y CHECKOUT STRIPE
 # ==========================
 
 class CreatePaymentIntentView(APIView):
-    """
-    POST /api/payment/create-intent/
-    body: { "amount": 6000 }  # S/ 60.00 en céntimos
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        amount = request.data.get('amount')
+        amount = request.data.get("amount")
 
         if not amount:
-            return Response({"detail": "Falta el monto"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Falta monto"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            intent = stripe.PaymentIntent.create(
-                amount=int(amount),
-                currency="pen",  # o "usd"
-                metadata={"user_id": request.user.id}
-            )
-            return Response({"clientSecret": intent['client_secret']})
-        except Exception as e:
-            return Response(
-                {"detail": f"Error al crear PaymentIntent: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        intent = stripe.PaymentIntent.create(
+            amount=int(amount),
+            currency="pen",
+            metadata={"user_id": request.user.id}
+        )
+
+        return Response({"clientSecret": intent["client_secret"]})
 
 
 class CheckoutConfirmView(APIView):
-    """
-    POST /api/checkout/confirm/
-    {
-      "items": [
-        { "producto_id": 1, "cantidad": 2, "precio": "15.00" },
-        { "producto_id": 5, "cantidad": 1, "precio": "30.00" }
-      ],
-      "total": "60.00",
-      "payment_id": "pi_XXX"
-    }
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        data = request.data
-        items = data.get('items', [])
-        total = data.get('total')
-        payment_id = data.get('payment_id')
+        print("📩 DATA RECIBIDA EN /checkout/confirm/:", request.data)
+
+        items = request.data.get("items", [])
+        total = request.data.get("total")
+        payment_id = request.data.get("payment_id")
 
         if not items:
-            return Response({"detail": "No se enviaron items"}, status=status.HTTP_400_BAD_REQUEST)
-        if total is None:
-            return Response({"detail": "Falta el total"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "No items"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Crear la orden
         order = Order.objects.create(
             user=request.user,
             total=total,
             payment_id=payment_id,
-            status='paid'
+            status="paid"
         )
 
-        # Crear items asociados
         for item in items:
-            try:
-                producto = Producto.objects.get(id=item['producto_id'])
-            except Producto.DoesNotExist:
-                continue  # podrías manejar error distinto
-
-            cantidad = int(item['cantidad'])
-            precio = item.get('precio', producto.precio)
-
+            producto = Producto.objects.get(id=item["producto_id"])
             OrderItem.objects.create(
                 order=order,
                 product=producto,
-                quantity=cantidad,
-                price=precio
+                quantity=item["cantidad"],
+                price=item.get("precio", producto.precio),
             )
+        # 3️⃣ Vaciar el carrito global (id=1)
+        carrito = get_default_cart()
+        carrito.items.all().delete() 
 
-        serializer = OrderSerializer(order)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)

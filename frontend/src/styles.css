@@ -855,3 +855,47 @@ body {
     transform: scale(1);
   }
 }
+
+/* ====== HISTORIAL DE COMPRAS ====== */
+
+.historial-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.pastel-card {
+  background: #ffeaf7;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  max-width: 420px;
+}
+
+.historial-items {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.historial-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.img-small {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.item-name {
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}

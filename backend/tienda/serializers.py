@@ -78,18 +78,21 @@ class RegisterSerializer(serializers.ModelSerializer):
 # 🧾 ORDER SERIALIZERS
 # ==============================
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.SerializerMethodField()
-
     class Meta:
         model = OrderItem
         fields = ('id', 'product', 'quantity', 'price')
 
-    def get_product(self, obj):
-        return {
-            "id": obj.product.id,
-            "nombre": obj.product.nombre,
-            "imagen": getattr(obj.product, 'imagen', None),
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        data["product"] = {
+            "id": instance.product.id,
+            "nombre": instance.product.nombre,
+            "imagen": instance.product.imagen.url if instance.product.imagen else None
         }
+
+        return data
+
 
 
 class OrderSerializer(serializers.ModelSerializer):
